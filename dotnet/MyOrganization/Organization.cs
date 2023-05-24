@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace MyOrganization
 {
     internal abstract class Organization
     {
         private Position root;
+        private int numberOfEmployees = 0;
 
         public Organization()
         {
@@ -27,7 +25,20 @@ namespace MyOrganization
         public Position? Hire(Name person, string title)
         {
             //your code here
-            return null;
+            var hiredPosition = GetPositionByTitle(root, title);
+
+            if (hiredPosition is null || hiredPosition.IsFilled())
+                return null;
+
+            hiredPosition.SetEmployee(new Employee(++numberOfEmployees, person));
+            return hiredPosition;
+        }
+
+        private Position? GetPositionByTitle(Position position, string title)
+        {
+            if (string.Equals(position.GetTitle(), title, System.StringComparison.OrdinalIgnoreCase))
+                return position;
+            return position.GetDirectReports().Select(directReport => GetPositionByTitle(directReport, title)).FirstOrDefault(p => p is not null);
         }
 
         override public string ToString()
